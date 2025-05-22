@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LeadRequest;
 use App\Models\Lead;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class LeadController extends Controller
 {
@@ -12,7 +15,8 @@ class LeadController extends Controller
      */
     public function index()
     {
-        //
+        $leads = Lead::all();
+        return inertia::render('leads/index', compact('leads'));
     }
 
     /**
@@ -26,9 +30,14 @@ class LeadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(LeadRequest $lead_request)
     {
-        //
+        Lead::create([
+            ...$lead_request->validated(),
+            'user_id'=>Auth::id(),
+        ]);
+        return redirect()->back()->with('success', 'Lead created successfully.');
+
     }
 
     /**
@@ -50,9 +59,12 @@ class LeadController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Lead $lead)
+    public function update(LeadRequest $lead_request, Lead $lead)
     {
-        //
+        $lead->update([
+            ...$lead_request->validated()
+        ]);
+        return redirect()->back()->with('success', 'Lead updated successfully.');
     }
 
     /**
@@ -60,6 +72,7 @@ class LeadController extends Controller
      */
     public function destroy(Lead $lead)
     {
-        //
+        $lead->delete();
+        return redirect()->route('leads.index')->with('success', 'Lead deleted.');
     }
 }

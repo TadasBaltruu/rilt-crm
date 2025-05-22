@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\LeadController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -56,4 +57,6 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
     Route::resource('customers', CustomerController::class);
+    Route::resource('leads', LeadController::class);
+
 });
