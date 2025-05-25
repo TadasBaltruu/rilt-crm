@@ -14,10 +14,36 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::all();
-        return inertia::render("customers/index", compact("customers"));
+      //  dd($request);
+        $query = Customer::query();
+//        if($request->filled('filters')){
+//            $requestOrder = $request->only(['filters']);
+//            foreach ($requestOrder as $key => $value) {
+//                foreach ($value as $k => $v) {
+//               //     dd($v['direction']);
+//                    if($v['direction'] != '')
+//                        $query->orderBy($k, $v['direction']);
+//                }
+//            }
+//        }
+        if ($request->filled('filters')) {
+            foreach ($request->input('filters') as $field => $sort) {
+                if (!empty($sort['direction'])) {
+                    $query->orderBy($field, $sort['direction']);
+                }
+            }
+        }
+////        if ($request->filled('orderBy') && in_array($request->get('orderBy'), ['name', 'email', 'created_at'])) {
+//            $direction = $request->get('direction') === 'asc' ? 'asc' : 'desc';
+//            $query->orderBy($request->get('orderBy'), $direction);
+//        } else {
+//            $query->orderBy('created_at', 'desc');
+//        }
+        $customers = $query->paginate(10)->appends($request->only(['filters']));
+        $filters = $request->only(['filters']);
+        return inertia::render("customers/index", compact("customers", "filters"));
     }
 
     /**
